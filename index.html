@@ -2,25 +2,48 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>資産撮影ツール</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>固定資産撮影</title>
 
-<link rel="stylesheet" href="style.css">
+<link css
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+app.jsscript>
+
 </head>
-
 <body>
 
-<h2>固定資産 撮影アプリ</h2>
+<h2>固定資産撮影システム</h2>
 
-<div id="qr-reader"></div>
+<div class="card">
 
-<div id="assetNumber">未スキャン</div>
+<h3>① シール撮影</h3>
 
-<button onclick="takePhoto()">写真を撮る</button>
+<input
+id="labelCapture"
+type="file"
+accept="image/*"
+capture="environment">
 
-<script src="app.js"></script>
+<p id="status">シールを撮影してください</p>
+
+<p id="assetNo">未認識</p>
+
+<button id="confirmBtn" disabled>
+番号OK
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>② 設備撮影</h3>
+
+<button id="photoBtn" disabled>
+設備写真を撮影
+</button>
+
+</div>
 
 </body>
 </html>
