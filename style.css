@@ -1,3 +1,6 @@
+/* =====================================
+   リセット
+===================================== */
 * {
     margin: 0;
     padding: 0;
@@ -5,497 +8,367 @@
 }
 
 :root {
-
     --primary: #0078d4;
-    --primary-hover: #106ebe;
-
-    --success: #107c10;
-    --success-hover: #0b6a0b;
-
-    --secondary: #605e5c;
-
-    --bg: #f3f2f1;
-    --card: #ffffff;
-
-    --text: #323130;
-    --border: #e1dfdd;
-
-    --shadow:
-        0 2px 8px rgba(0,0,0,0.08);
-
+    --secondary: #666;
+    --success: #28a745;
+    --border: #ddd;
+    --bg: #f5f7fa;
 }
 
 body {
-
-    font-family:
-        "Segoe UI",
-        "Yu Gothic",
-        sans-serif;
-
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
     background: var(--bg);
-    color: var(--text);
-
-    min-height: 100vh;
-
+    color: #333;
 }
 
+/* =====================================
+   ヘッダー
+===================================== */
 header {
-
-    background: white;
-
     padding: 16px;
-
+    background: #fff;
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-
     z-index: 100;
-
-    box-shadow: var(--shadow);
-
 }
 
 header h1 {
-
-    text-align: center;
-
-    font-size: 1.5rem;
-
-    margin-bottom: 12px;
-
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
+/* =====================================
+   メイン
+===================================== */
 main {
-
     max-width: 900px;
-    margin: auto;
-
+    margin: 0 auto;
     padding: 16px;
-
 }
 
 .card {
-
-    background: var(--card);
-
-    border-radius: 16px;
-
-    padding: 20px;
-
-    margin-bottom: 20px;
-
-    box-shadow: var(--shadow);
-
+    background: #fff;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .card h2 {
-
-    margin-bottom: 16px;
-
+    margin-bottom: 12px;
 }
 
 .hidden {
-
-    display: none; !important;
-
+    display: none !important;
 }
 
-/* ---------------- */
-/* サマリー */
-/* ---------------- */
-
+/* =====================================
+   サマリー
+===================================== */
 .summary-card {
-
-    background: var(--primary);
-
-    color: white;
-
-    border-radius: 12px;
-
-    padding: 12px;
-
-    text-align: center;
-
+    background: #eef6ff;
+    border-radius: 8px;
+    padding: 10px;
 }
 
 .summary-title {
-
-    font-size: 0.9rem;
-
+    font-size: 14px;
+    color: #666;
 }
 
 .summary-value {
-
-    font-size: 1.8rem;
+    font-size: 22px;
     font-weight: bold;
-
+    color: var(--primary);
 }
 
-/* ---------------- */
-/* カメラ */
-/* ---------------- */
-
+/* =====================================
+   カメラ
+===================================== */
 .camera-container {
-
     width: 100%;
-
-    overflow: hidden;
-
-    border-radius: 12px;
-
-    background: black;
-
-    margin-bottom: 16px;
-
+    margin-bottom: 12px;
 }
 
 video {
-
     width: 100%;
-
-    display: block;
-
-    min-height: 300px;
-
-    object-fit: cover;
-
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #000;
 }
 
-/* ---------------- */
-/* OCR結果 */
-/* ---------------- */
-
+/* =====================================
+   OCR結果
+===================================== */
 .asset-number-box {
-
-    background: #fff4ce;
-
-    border: 2px solid #ffb900;
-
-    border-radius: 12px;
-
-    padding: 20px;
-
-    margin: 20px 0;
-
+    border: 2px solid var(--primary);
+    border-radius: 10px;
     text-align: center;
-
+    padding: 20px;
+    margin-bottom: 12px;
 }
 
 #recognizedAssetNo {
-
-    font-size: 2.4rem;
-
+    font-size: 32px;
     font-weight: bold;
-
-    color: #d83b01;
-
-    letter-spacing: 3px;
-
+    letter-spacing: 2px;
 }
 
 .asset-large {
-
-    font-size: 2rem;
-
+    font-size: 32px;
     font-weight: bold;
-
     color: var(--primary);
-
 }
 
-/* ---------------- */
-/* 現在の資産 */
-/* ---------------- */
-
+/* =====================================
+   現在の資産
+===================================== */
 .current-asset {
-
     text-align: center;
-
-    margin-bottom: 20px;
-
+    margin-bottom: 16px;
 }
 
 .current-asset .label {
-
-    margin-bottom: 8px;
-
     color: #666;
-
+    margin-bottom: 6px;
 }
 
-/* ---------------- */
-/* 撮影枚数 */
-/* ---------------- */
-
+/* =====================================
+   撮影枚数
+===================================== */
 .photo-counter {
-
+    font-size: 18px;
+    margin-bottom: 16px;
     text-align: center;
-
-    font-size: 1.3rem;
-
-    font-weight: bold;
-
-    margin-bottom: 20px;
-
 }
 
-/* ---------------- */
-/* ボタン */
-/* ---------------- */
+/* =====================================
+   撮影済サムネイル
+===================================== */
+.photo-preview-container {
+    margin-bottom: 20px;
+}
 
-button {
+.photo-preview-container h3 {
+    margin-bottom: 10px;
+}
 
+.photo-preview-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-preview-item {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.photo-preview-item img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
+/* =====================================
+   ボタン
+===================================== */
+button {
     border: none;
-
-    border-radius: 12px;
-
+    border-radius: 8px;
     cursor: pointer;
-
-    font-weight: bold;
-
-    transition: 0.2s;
-
+    padding: 12px 16px;
+    font-size: 16px;
 }
 
 .primary-button {
-
     background: var(--primary);
     color: white;
-
-    min-height: 60px;
-
-    font-size: 1.2rem;
-
 }
 
 .primary-button:active {
-
-    background: var(--primary-hover);
-
+    opacity: 0.8;
 }
 
 .secondary-button {
-
     background: var(--secondary);
     color: white;
-
-    min-height: 60px;
-
-    font-size: 1.1rem;
-
 }
 
 .success-button {
-
     background: var(--success);
     color: white;
-
-    min-height: 65px;
-
-    font-size: 1.2rem;
-
 }
 
 .success-button:active {
-
-    background: var(--success-hover);
-
+    opacity: 0.8;
 }
 
 .button-group {
+    display: flex;
+    gap: 10px;
+}
 
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 12px;
-
+.button-group button {
+    flex: 1;
 }
 
 .button-stack {
-
     display: flex;
-
     flex-direction: column;
-
-    gap: 12px;
-
-}
-
-/* ---------------- */
-/* ステータス */
-/* ---------------- */
-
-.status {
-
-    margin-top: 16px;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    background: #faf9f8;
-
-    text-align: center;
-
-}
-
-/* ---------------- */
-/* 一覧 */
-/* ---------------- */
-
-.list-header {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 16px;
-
     gap: 10px;
+}
 
+/* =====================================
+   ステータス
+===================================== */
+.status {
+    margin-top: 10px;
+    color: #666;
+}
+
+/* =====================================
+   一覧
+===================================== */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .list-header button {
-
     width: auto;
-
-    padding: 10px 15px;
-
 }
 
 .table-wrapper {
-
     overflow-x: auto;
-
 }
 
 table {
-
     width: 100%;
-
     border-collapse: collapse;
-
 }
 
 th {
-
-    background: #f3f2f1;
-
+    background: #f0f0f0;
 }
 
 th,
 td {
-
-    padding: 12px;
-
-    border-bottom: 1px solid var(--border);
-
+    border: 1px solid var(--border);
+    padding: 8px;
     text-align: center;
-
 }
 
 tbody tr:nth-child(even) {
-
     background: #fafafa;
-
 }
 
-/* ---------------- */
-/* OCRローディング */
-/* ---------------- */
-
-.loading-overlay {
-
+/* =====================================
+   モーダル
+===================================== */
+.modal {
     position: fixed;
-
     inset: 0;
+    background: rgba(0,0,0,0.5);
 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 2000;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content h2 {
+    margin-bottom: 16px;
+}
+
+.modal-content p {
+    margin-bottom: 10px;
+}
+
+/* =====================================
+   OCRローディング
+===================================== */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
     background: rgba(0,0,0,0.6);
 
     display: flex;
-
     justify-content: center;
-
     align-items: center;
 
     z-index: 9999;
+}
 
+.loading-overlay.hidden {
+    display: none !important;
 }
 
 .loading-box {
-
     background: white;
-
-    border-radius: 16px;
-
-    padding: 30px;
-
-    min-width: 250px;
-
+    padding: 24px;
+    border-radius: 12px;
     text-align: center;
-
+    min-width: 220px;
 }
 
 .spinner {
-
-    width: 50px;
-    height: 50px;
-
+    width: 48px;
+    height: 48px;
     border: 5px solid #ddd;
     border-top: 5px solid var(--primary);
-
     border-radius: 50%;
-
+    margin: 0 auto 12px;
     animation: spin 1s linear infinite;
-
-    margin: 0 auto 15px auto;
-
 }
 
 @keyframes spin {
-
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
-
 }
 
-/* ---------------- */
-/* モバイル最適化 */
-/* ---------------- */
-
+/* =====================================
+   モバイル最適化
+===================================== */
 @media (max-width: 768px) {
 
     header h1 {
-
-        font-size: 1.3rem;
-
+        font-size: 18px;
     }
 
+    .asset-large,
     #recognizedAssetNo {
-
-        font-size: 2rem;
-
+        font-size: 26px;
     }
 
-    .asset-large {
-
-        font-size: 1.8rem;
-
+    .button-group {
+        flex-direction: column;
     }
 
     button {
-
-        min-height: 70px;
-
+        width: 100%;
     }
-
 }
