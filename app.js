@@ -1,63 +1,109 @@
-let assetNumber = "";
+let assetNo = "";
 
-// QR読み取り
-function startScanner() {
-  const qr = new Html5Qrcode("qr-reader");
+const labelCapture = document.getElementById("labelCapture");
+const statusText = document.getElementById("status");
+const assetNoText = document.getElementById("assetNo");
+const confirmBtn = document.getElementById("confirmBtn");
+const photoBtn = document.getElementById("photoBtn");
 
-  qr.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
-    (decodedText) => {
-      assetNumber = decodedText;
+labelCapture.addEventListener("change", async (e)=>{
 
-      document.getElementById("assetNumber").innerText =
-        "資産番号: " + assetNumber;
-
-      qr.stop();
-    },
-    (error) => {}
-  );
-}
-
-startScanner();
-
-// 写真撮影
-function takePhoto() {
-
-  if (!assetNumber) {
-    alert("先にQRコードを読み取ってください");
-    return;
-  }
-
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.capture = 'environment';
-
-  input.onchange = (e) => {
     const file = e.target.files[0];
 
-    const now = new Date();
-    const timestamp =
-      now.getFullYear() +
-      ("0"+(now.getMonth()+1)).slice(-2) +
-      ("0"+now.getDate()).slice(-2) + "_" +
-      ("0"+now.getHours()).slice(-2) +
-      ("0"+now.getMinutes()).slice(-2) +
-      ("0"+now.getSeconds()).slice(-2);
+    if(!file) return;
 
-    const newName = assetNumber + "_" + timestamp + ".jpg";
+    statusText.innerText = "OCR解析中...";
 
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(file);
-    link.download = newName;
-    link.click();
+    const result = await Tesseract.recognize(
+        file,
+        "jpn+eng"
+    );
 
-    // リセット
-    assetNumber = "";
-    document.getElementById("assetNumber").innerText = "未スキャン";
-    startScanner();
-  };
+    const text = result.data.text;
 
-  input.click();
-}
+    console.log(text);
+
+    const match = text.match(/\d{8}/);
+
+    if(match){
+
+        assetNo = match[0];
+
+        assetNoText.innerText = assetNo;
+
+        statusText.innerText = "番号を確認してください";
+
+        confirmBtn.disabled = false;
+
+    }else{
+
+        statusText.innerText =
+        "番号が見つかりません";
+
+    }
+
+});
+
+confirmBtn.addEventListener("click",()=>{
+
+    photoBtn.disabled = false;
+
+    alert(
+      "設備全体写真を撮影してください"
+    );
+
+});
+
+photoBtn.addEventListener("click",()=>{
+
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
+
+    input.onchange = (e)=>{
+
+        const file = e.target.files[0];
+
+        const now = new Date();
+
+        const stamp =
+            now.getFullYear() +
+            String(now.getMonth()+1).padStart(2,"0") +
+            String(now.getDate()).padStart(2,"0") +
+            "_" +
+            String(now.getHours()).padStart(2,"0") +
+            String(now.getMinutes()).padStart(2,"0") +
+            String(now.getSeconds()).padStart(2,"0");
+
+        const filename =
+            assetNo + "_" + stamp + ".jpg";
+
+        const link =
+            document.createElement("a");
+
+        link.href =
+            URL.createObjectURL(file);
+
+        link.download =
+            filename;
+
+        link.click();
+
+        alert(
+          "保存完了\n" + filename
+        );
+
+        assetNo="";
+
+        assetNoText.innerText="未認識";
+
+        photoBtn.disabled=true;
+        confirmBtn.disabled=true;
+
+    };
+
+    input.click();
+
+});
