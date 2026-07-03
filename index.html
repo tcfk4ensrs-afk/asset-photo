@@ -1,50 +1,217 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>固定資産撮影</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>固定資産棚卸システム</title>
 
-<link css
+    style.css
 
-.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-app.jsscript>
-
+    https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
+    app.js
 </head>
 <body>
 
-<h2>固定資産撮影システム</h2>
+<header>
+    <h1>固定資産棚卸システム</h1>
 
-<div class="card">
+    <div class="summary-card">
+        <div class="summary-title">棚卸済件数</div>
+        <div id="assetCount" class="summary-value">
+            0件
+        </div>
+    </div>
+</header>
 
-<h3>① シール撮影</h3>
 
-<input
-id="labelCapture"
-type="file"
-accept="image/*"
-capture="environment">
+<main>
 
-<p id="status">シールを撮影してください</p>
+    <!-- OCRステップ -->
+    <section id="ocrSection" class="card active">
 
-<p id="assetNo">未認識</p>
+        <h2>① 管理プレート読取</h2>
 
-<button id="confirmBtn" disabled>
-番号OK
-</button>
+        <div class="camera-container">
 
-</div>
+            <video
+                id="ocrVideo"
+                autoplay
+                playsinline
+                muted>
+            </video>
 
-<div class="card">
+            <canvas
+                id="ocrCanvas"
+                hidden>
+            </canvas>
 
-<h3>② 設備撮影</h3>
+        </div>
 
-<button id="photoBtn" disabled>
-設備写真を撮影
-</button>
+        <button id="scanButton" class="primary-button">
+            プレートを撮影
+        </button>
+
+        <div id="ocrStatus" class="status">
+            固定資産管理プレートをカメラに映してください
+        </div>
+
+    </section>
+
+
+    <!-- OCR確認 -->
+    <section id="confirmSection" class="card hidden">
+
+        <h2>② 認識結果確認</h2>
+
+        <div class="asset-number-box">
+            <span id="recognizedAssetNo">
+                ------
+            </span>
+        </div>
+
+        <div class="button-group">
+
+            <button
+                id="retryButton"
+                class="secondary-button">
+                再読取
+            </button>
+
+            <button
+                id="confirmButton"
+                class="primary-button">
+                番号OK
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- 撮影モード -->
+    <section id="photoSection" class="card hidden">
+
+        <h2>③ 設備写真撮影</h2>
+
+        <div class="current-asset">
+
+            <div class="label">
+                固定資産番号
+            </div>
+
+            <div id="currentAssetNo" class="asset-large">
+                10001116
+            </div>
+
+        </div>
+
+        <div class="camera-container">
+
+            <video
+                id="photoVideo"
+                autoplay
+                playsinline
+                muted>
+            </video>
+
+            <canvas
+                id="photoCanvas"
+                hidden>
+            </canvas>
+
+        </div>
+
+        <div class="photo-counter">
+
+            撮影枚数：
+            <span id="photoCount">0</span>
+            枚
+
+        </div>
+
+        <div class="button-stack">
+
+            <button
+                id="mainPhotoBtn"
+                class="primary-button">
+                全体像撮影
+            </button>
+
+            <button
+                id="additionalPhotoBtn"
+                class="secondary-button">
+                追加で撮影
+            </button>
+
+            <button
+                id="finishAssetBtn"
+                class="success-button">
+                撮影終了
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- 棚卸済一覧 -->
+    <section class="card">
+
+        <div class="list-header">
+
+            <h2>棚卸済一覧</h2>
+
+            <button
+                id="exportCsvBtn"
+                class="secondary-button">
+                CSV出力
+            </button>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table id="assetTable">
+
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>固定資産番号</th>
+                    <th>撮影枚数</th>
+                    <th>読取日時</th>
+                </tr>
+                </thead>
+
+                <tbody id="assetTableBody">
+
+                <!-- JSで追加 -->
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ローディング -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <p>
+            OCR解析中...
+        </p>
+
+    </div>
 
 </div>
 
 </body>
 </html>
-``
