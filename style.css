@@ -1,26 +1,501 @@
-body{
-  font-family:sans-serif;
-  text-align:center;
-  background:#f4f4f4;
-  padding:20px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.card{
-  background:white;
-  border-radius:10px;
-  padding:20px;
-  margin:20px auto;
-  max-width:500px;
+:root {
+
+    --primary: #0078d4;
+    --primary-hover: #106ebe;
+
+    --success: #107c10;
+    --success-hover: #0b6a0b;
+
+    --secondary: #605e5c;
+
+    --bg: #f3f2f1;
+    --card: #ffffff;
+
+    --text: #323130;
+    --border: #e1dfdd;
+
+    --shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+
 }
 
-button{
-  padding:15px 30px;
-  font-size:18px;
-  cursor:pointer;
+body {
+
+    font-family:
+        "Segoe UI",
+        "Yu Gothic",
+        sans-serif;
+
+    background: var(--bg);
+    color: var(--text);
+
+    min-height: 100vh;
+
 }
 
-#assetNo{
-  color:red;
-  font-size:32px;
-  font-weight:bold;
+header {
+
+    background: white;
+
+    padding: 16px;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 100;
+
+    box-shadow: var(--shadow);
+
+}
+
+header h1 {
+
+    text-align: center;
+
+    font-size: 1.5rem;
+
+    margin-bottom: 12px;
+
+}
+
+main {
+
+    max-width: 900px;
+    margin: auto;
+
+    padding: 16px;
+
+}
+
+.card {
+
+    background: var(--card);
+
+    border-radius: 16px;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    box-shadow: var(--shadow);
+
+}
+
+.card h2 {
+
+    margin-bottom: 16px;
+
+}
+
+.hidden {
+
+    display: none;
+
+}
+
+/* ---------------- */
+/* サマリー */
+/* ---------------- */
+
+.summary-card {
+
+    background: var(--primary);
+
+    color: white;
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    text-align: center;
+
+}
+
+.summary-title {
+
+    font-size: 0.9rem;
+
+}
+
+.summary-value {
+
+    font-size: 1.8rem;
+    font-weight: bold;
+
+}
+
+/* ---------------- */
+/* カメラ */
+/* ---------------- */
+
+.camera-container {
+
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
+    background: black;
+
+    margin-bottom: 16px;
+
+}
+
+video {
+
+    width: 100%;
+
+    display: block;
+
+    min-height: 300px;
+
+    object-fit: cover;
+
+}
+
+/* ---------------- */
+/* OCR結果 */
+/* ---------------- */
+
+.asset-number-box {
+
+    background: #fff4ce;
+
+    border: 2px solid #ffb900;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    margin: 20px 0;
+
+    text-align: center;
+
+}
+
+#recognizedAssetNo {
+
+    font-size: 2.4rem;
+
+    font-weight: bold;
+
+    color: #d83b01;
+
+    letter-spacing: 3px;
+
+}
+
+.asset-large {
+
+    font-size: 2rem;
+
+    font-weight: bold;
+
+    color: var(--primary);
+
+}
+
+/* ---------------- */
+/* 現在の資産 */
+/* ---------------- */
+
+.current-asset {
+
+    text-align: center;
+
+    margin-bottom: 20px;
+
+}
+
+.current-asset .label {
+
+    margin-bottom: 8px;
+
+    color: #666;
+
+}
+
+/* ---------------- */
+/* 撮影枚数 */
+/* ---------------- */
+
+.photo-counter {
+
+    text-align: center;
+
+    font-size: 1.3rem;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+
+}
+
+/* ---------------- */
+/* ボタン */
+/* ---------------- */
+
+button {
+
+    width: 100%;
+
+    border: none;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    transition: 0.2s;
+
+}
+
+.primary-button {
+
+    background: var(--primary);
+    color: white;
+
+    min-height: 60px;
+
+    font-size: 1.2rem;
+
+}
+
+.primary-button:active {
+
+    background: var(--primary-hover);
+
+}
+
+.secondary-button {
+
+    background: var(--secondary);
+    color: white;
+
+    min-height: 60px;
+
+    font-size: 1.1rem;
+
+}
+
+.success-button {
+
+    background: var(--success);
+    color: white;
+
+    min-height: 65px;
+
+    font-size: 1.2rem;
+
+}
+
+.success-button:active {
+
+    background: var(--success-hover);
+
+}
+
+.button-group {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+
+}
+
+.button-stack {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+/* ---------------- */
+/* ステータス */
+/* ---------------- */
+
+.status {
+
+    margin-top: 16px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: #faf9f8;
+
+    text-align: center;
+
+}
+
+/* ---------------- */
+/* 一覧 */
+/* ---------------- */
+
+.list-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 16px;
+
+    gap: 10px;
+
+}
+
+.list-header button {
+
+    width: auto;
+
+    padding: 10px 15px;
+
+}
+
+.table-wrapper {
+
+    overflow-x: auto;
+
+}
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+th {
+
+    background: #f3f2f1;
+
+}
+
+th,
+td {
+
+    padding: 12px;
+
+    border-bottom: 1px solid var(--border);
+
+    text-align: center;
+
+}
+
+tbody tr:nth-child(even) {
+
+    background: #fafafa;
+
+}
+
+/* ---------------- */
+/* OCRローディング */
+/* ---------------- */
+
+.loading-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.6);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 9999;
+
+}
+
+.loading-box {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    min-width: 250px;
+
+    text-align: center;
+
+}
+
+.spinner {
+
+    width: 50px;
+    height: 50px;
+
+    border: 5px solid #ddd;
+    border-top: 5px solid var(--primary);
+
+    border-radius: 50%;
+
+    animation: spin 1s linear infinite;
+
+    margin: 0 auto 15px auto;
+
+}
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+/* ---------------- */
+/* モバイル最適化 */
+/* ---------------- */
+
+@media (max-width: 768px) {
+
+    header h1 {
+
+        font-size: 1.3rem;
+
+    }
+
+    #recognizedAssetNo {
+
+        font-size: 2rem;
+
+    }
+
+    .asset-large {
+
+        font-size: 1.8rem;
+
+    }
+
+    button {
+
+        min-height: 70px;
+
+    }
+
 }
