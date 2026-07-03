@@ -139,10 +139,18 @@ scanButton.addEventListener(
             "hidden"
         );
 
+        const loadingText =
+            document.querySelector(
+                "#loadingOverlay p"
+            );
+
+        loadingText.innerText =
+            "OCR解析開始";
+
         try {
 
             const imageData =
-                captureFromVideo(
+                captureOCRImage(
                     ocrVideo,
                     ocrCanvas
                 );
@@ -150,25 +158,48 @@ scanButton.addEventListener(
             const result =
                 await Tesseract.recognize(
                     imageData,
-                    "jpn+eng"
+                    "eng",
+                    {
+                        logger: m => {
+
+                            if (
+                                m.progress !== undefined
+                            ) {
+
+                                loadingText.innerText =
+                                    `${m.status} ${Math.round(
+                                        m.progress * 100
+                                    )}%`;
+                            }
+                        }
+                    }
                 );
 
-            const text =
+            let text =
                 result.data.text;
 
-            console.log(text);
+            text = text
+                .replace(/O/g, "0")
+                .replace(/I/g, "1")
+                .replace(/l/g, "1")
+                .replace(/S/g, "5")
+                .replace(/[^0-9]/g, "");
 
-            const match =
+            console.log(
+                "OCR結果:",
+                text
+            );
+
+            let match =
                 text.match(/\d{8}/);
 
             if (!match) {
 
                 alert(
-                    "固定資産番号が見つかりません"
+                    "固定資産番号が認識できませんでした。\nプレートを画面中央に大きく表示してください。"
                 );
 
                 return;
-
             }
 
             currentAssetNo =
@@ -199,8 +230,9 @@ scanButton.addEventListener(
                 "hidden"
             );
 
+            loadingText.innerText =
+                "OCR解析中...";
         }
-
     }
 );
 
@@ -306,6 +338,41 @@ function takePhoto() {
 // =====================================
 // キャプチャ
 // =====================================
+function captureOCRImage(video, canvas) {
+    const ctx = canvas.getContext("2d");
+
+    const width = 1280;
+    const height =
+        Math.floor(
+            video.videoHeight *
+            (width / video.videoWidth)
+        );
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const sx = video.videoWidth * 0.25;
+    const sy = video.videoHeight * 0.45;
+    const sw = video.videoWidth * 0.50;
+    const sh = video.videoHeight * 0.20;
+
+    ctx.drawImage(
+        video,
+        sx,
+        sy,
+        sw,
+        sh,
+        0,
+        0,
+        width,
+        height
+    );
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        0.8
+    );
+}
 
 function captureFromVideo(
     video,
