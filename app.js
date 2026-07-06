@@ -148,18 +148,25 @@ scanButton.addEventListener(
                 );
 
             const result =
-                await Tesseract.recognize(
-                    imageData,
-                    "jpn+eng"
-                );
+    await Tesseract.recognize(
+        imageData,
+        "eng"
+    );
 
-            const text =
-                result.data.text;
+let text =
+    result.data.text;
 
-            console.log(text);
+alert("OCR結果:\n" + text);
 
-            const match =
-                text.match(/\d{8}/);
+text = text
+    .replace(/\s/g, "")
+    .replace(/O/g, "0")
+    .replace(/o/g, "0")
+    .replace(/I/g, "1")
+    .replace(/l/g, "1");
+
+const match =
+    text.match(/\d{8}/);
 
             if (!match) {
 
