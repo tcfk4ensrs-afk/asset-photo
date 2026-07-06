@@ -102,28 +102,43 @@ async function startCamera() {
 
         videoStream =
             await navigator
-            .mediaDevices
-            .getUserMedia({
-                video: {
-                    facingMode: "environment"
-                }
-            });
+                .mediaDevices
+                .getUserMedia({
+                    video: true
+                });
 
-        ocrVideo.srcObject =
-            videoStream;
-
-        photoVideo.srcObject =
-            videoStream;
-
-    } catch (err) {
-
-        alert(
-            "カメラ起動に失敗しました"
+        console.log(
+            "ocrVideo",
+            ocrVideo
         );
+
+        console.log(
+            "photoVideo",
+            photoVideo
+        );
+
+        if (ocrVideo) {
+            ocrVideo.srcObject =
+                videoStream;
+        }
+
+        if (photoVideo) {
+            photoVideo.srcObject =
+                videoStream;
+        }
+
+    }
+    catch (err) {
 
         console.error(err);
 
+        alert(
+            "カメラ起動失敗\n\n" +
+            err.message
+        );
+
     }
+
 }
 
 
@@ -148,22 +163,23 @@ scanButton.addEventListener(
                 );
 
             const result =
-                await Tesseract.recognize(
-                    imageData,
-                    "eng",
-                    {
-                        tessedit_char_whitelist:
-                            "0123456789"
-                    }
-                );
+    await Tesseract.recognize(
+        imageData,
+        "eng"
+    );
 
             let text =
-                result.data.text;
+    result.data.text;
 
-            console.log(
-                "OCR結果:",
-                text
-            );
+console.log(text);
+
+text =
+    text.replace(/\D/g, "");
+
+alert(
+    "OCR結果\n\n" +
+    text
+);
 
             text =
                 text.replace(/\D/g, "");
@@ -324,7 +340,11 @@ function takePhoto() {
 // キャプチャ
 // =====================================
 
-function captureFromVideo(
+// =====================================
+// 固定資産番号専用切り出し
+// =====================================
+
+function captureAssetNumberOnly(
     video,
     canvas
 ) {
@@ -332,18 +352,17 @@ function captureFromVideo(
     const ctx =
         canvas.getContext("2d");
 
-    // 固定資産番号の黒帯付近だけ切り出す
     const cropX =
-        video.videoWidth * 0.30;
+        video.videoWidth * 0.25;
 
     const cropY =
-        video.videoHeight * 0.45;
+        video.videoHeight * 0.40;
 
     const cropWidth =
-        video.videoWidth * 0.45;
+        video.videoWidth * 0.50;
 
     const cropHeight =
-        video.videoHeight * 0.12;
+        video.videoHeight * 0.15;
 
     canvas.width =
         cropWidth;
@@ -363,7 +382,6 @@ function captureFromVideo(
         cropHeight
     );
 
-    // 白黒化
     const imageData =
         ctx.getImageData(
             0,
@@ -389,7 +407,9 @@ function captureFromVideo(
             ) / 3;
 
         const value =
-            gray > 120 ? 255 : 0;
+            gray > 100
+                ? 255
+                : 0;
 
         data[i] = value;
         data[i + 1] = value;
@@ -407,7 +427,9 @@ function captureFromVideo(
         "image/jpeg",
         1.0
     );
+
 }
+
 
 // =====================================
 // サムネイル
