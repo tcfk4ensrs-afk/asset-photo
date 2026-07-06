@@ -332,24 +332,82 @@ function captureFromVideo(
     const ctx =
         canvas.getContext("2d");
 
+    // 固定資産番号の黒帯付近だけ切り出す
+    const cropX =
+        video.videoWidth * 0.30;
+
+    const cropY =
+        video.videoHeight * 0.45;
+
+    const cropWidth =
+        video.videoWidth * 0.45;
+
+    const cropHeight =
+        video.videoHeight * 0.12;
+
     canvas.width =
-        video.videoWidth;
+        cropWidth;
 
     canvas.height =
-        video.videoHeight;
+        cropHeight;
 
     ctx.drawImage(
         video,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        cropWidth,
+        cropHeight
+    );
+
+    // 白黒化
+    const imageData =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    const data =
+        imageData.data;
+
+    for (
+        let i = 0;
+        i < data.length;
+        i += 4
+    ) {
+
+        const gray =
+            (
+                data[i] +
+                data[i + 1] +
+                data[i + 2]
+            ) / 3;
+
+        const value =
+            gray > 120 ? 255 : 0;
+
+        data[i] = value;
+        data[i + 1] = value;
+        data[i + 2] = value;
+
+    }
+
+    ctx.putImageData(
+        imageData,
         0,
         0
     );
 
     return canvas.toDataURL(
         "image/jpeg",
-        0.95
+        1.0
     );
 }
-
 
 // =====================================
 // サムネイル
