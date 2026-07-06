@@ -158,23 +158,32 @@ scanButton.addEventListener(
 
 let text = result.data.text;
 
-console.log("OCR結果=", text);
+let digits =
+    text.replace(/\D/g, "");
 
-alert("OCR結果:\n" + text);
+alert(
+    "OCR結果:\n" +
+    text +
+    "\n\n数字抽出:\n" +
+    digits
+);
 
 text = text.replace(/\D/g, "");
 
-const match = text.match(/\d{8}/);
+cconst match =
+    text.match(/\d{8}/);
 
-            if (!match) {
+if (!match) {
 
-                alert(
-                    "固定資産番号が見つかりません"
-                );
+    alert(
+        "固定資産番号が見つかりません\n\nOCR結果:\n" + text
+    );
 
-                return;
+    console.log("OCR生データ=", text);
 
-            }
+    return;
+
+}
 
             currentAssetNo =
                 match[0];
