@@ -150,23 +150,21 @@ scanButton.addEventListener(
             const result =
     await Tesseract.recognize(
         imageData,
-        "eng"
+        "eng",
+        {
+            tessedit_char_whitelist: "0123456789"
+        }
     );
 
-let text =
-    result.data.text;
+let text = result.data.text;
+
+console.log("OCR結果=", text);
 
 alert("OCR結果:\n" + text);
 
-text = text
-    .replace(/\s/g, "")
-    .replace(/O/g, "0")
-    .replace(/o/g, "0")
-    .replace(/I/g, "1")
-    .replace(/l/g, "1");
+text = text.replace(/\D/g, "");
 
-const match =
-    text.match(/\d{8}/);
+const match = text.match(/\d{8}/);
 
             if (!match) {
 
