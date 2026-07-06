@@ -142,48 +142,50 @@ scanButton.addEventListener(
         try {
 
             const imageData =
-                captureFromVideo(
+                captureAssetNumberOnly(
                     ocrVideo,
                     ocrCanvas
                 );
 
             const result =
-    await Tesseract.recognize(
-        imageData,
-        "eng",
-        {
-            tessedit_char_whitelist: "0123456789"
-        }
-    );
+                await Tesseract.recognize(
+                    imageData,
+                    "eng",
+                    {
+                        tessedit_char_whitelist:
+                            "0123456789"
+                    }
+                );
 
-let text = result.data.text;
+            let text =
+                result.data.text;
 
-let digits =
-    text.replace(/\D/g, "");
+            console.log(
+                "OCR結果:",
+                text
+            );
 
-alert(
-    "OCR結果:\n" +
-    text +
-    "\n\n数字抽出:\n" +
-    digits
-);
+            text =
+                text.replace(/\D/g, "");
 
-text = text.replace(/\D/g, "");
+            alert(
+                "OCR認識結果\n\n" +
+                text
+            );
 
-cconst match =
-    text.match(/\d{8}/);
+            const match =
+                text.match(/\d{8}/);
 
-if (!match) {
+            if (!match) {
 
-    alert(
-        "固定資産番号が見つかりません\n\nOCR結果:\n" + text
-    );
+                alert(
+                    "固定資産番号を認識できませんでした。\n\n認識結果:\n" +
+                    text
+                );
 
-    console.log("OCR生データ=", text);
+                return;
 
-    return;
-
-}
+            }
 
             currentAssetNo =
                 match[0];
@@ -199,7 +201,8 @@ if (!match) {
                 "hidden"
             );
 
-        } catch (err) {
+        }
+        catch (err) {
 
             console.error(err);
 
@@ -207,7 +210,8 @@ if (!match) {
                 "OCR処理失敗"
             );
 
-        } finally {
+        }
+        finally {
 
             loadingOverlay.classList.add(
                 "hidden"
@@ -217,7 +221,6 @@ if (!match) {
 
     }
 );
-
 
 // =====================================
 // OCR再読取
