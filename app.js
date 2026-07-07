@@ -39,10 +39,10 @@ async function startCamera() {
         videoStream =
             await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: "environment",
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
+    facingMode: {
+        exact: "environment"
+    }
+}
             });
 
         if (ocrVideo) {
