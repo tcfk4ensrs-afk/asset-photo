@@ -1,30 +1,45 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>固定資産棚卸システム</title>
 
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
 
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="app.js" defer></script>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>
+固定資産棚卸システム
+</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="script>
+
 </head>
 
 <body>
 
 <header>
 
-    <h1>固定資産棚卸システム</h1>
+    <h1>
+        固定資産棚卸システム
+    </h1>
 
     <div class="summary-card">
+
         <div class="summary-title">
             棚卸済件数
         </div>
 
-        <div id="assetCount" class="summary-value">
+        <div
+            id="assetCount"
+            class="summary-value">
+
             0件
+
         </div>
+
     </div>
 
 </header>
@@ -32,117 +47,74 @@
 
 <main>
 
-    <!-- OCR読取 -->
-    <section id="ocrSection" class="card">
-
-        <h2>① 管理プレート読取</h2>
-
-        <div class="camera-container">
-
-            <video
-                id="ocrVideo"
-                autoplay
-                playsinline
-                muted>
-            </video>
-
-            <!-- OCRガイド -->
-            <div class="ocr-target-box">
-                固定No.の黒い帯をこの枠に合わせる
-            </div>
-
-            <canvas
-                id="ocrCanvas"
-                hidden>
-            </canvas>
-
-        </div>
-
-        <button
-            id="scanButton"
-            class="primary-button">
-            プレートを撮影
-        </button>
-
-        <div
-            id="ocrStatus"
-            class="status">
-
-            固定資産番号の黒い帯を
-            ガイド枠に合わせて撮影してください
-
-        </div>
-
-        <!-- OCRデバッグ画像 -->
-        <div class="debug-container">
-
-            <h3>OCR対象画像</h3>
-
-            <img
-                id="debugImage"
-                class="debug-image">
-
-        </div>
-
-    </section>
-
-
-    <!-- OCR確認 -->
+    <!-- ================================= -->
+    <!-- 固定資産番号入力 -->
+    <!-- ================================= -->
 
     <section
-        id="confirmSection"
-        class="card hidden">
+        id="inputSection"
+        class="card">
 
-        <h2>② 認識結果確認</h2>
+        <h2>
+            ① 固定資産番号
+        </h2>
+
+        <input
+            id="manualAssetNo"
+            type="text"
+            class="manual-input"
+            placeholder="固定資産番号を入力">
+
+        <button
+            id="manualConfirmBtn"
+            class="primary-button">
+
+            入力して開始
+
+        </button>
+
+        <hr class="section-divider">
+
+        <h3>
+            QRコード読取（今後追加）
+        </h3>
 
         <div
-            id="assetResultBox"
-            class="asset-number-box">
+            id="qrReaderPlaceholder"
+            class="placeholder-box">
 
-            <span id="recognizedAssetNo">
-                ------
-            </span>
-
-        </div>
-
-        <p id="ocrResultMessage"></p>
-
-        <div class="button-group">
-
-            <button
-                id="retryButton"
-                class="secondary-button">
-                再読取
-            </button>
-
-            <button
-                id="confirmButton"
-                class="primary-button">
-                番号OK
-            </button>
+            QRコード読取エリア
 
         </div>
 
     </section>
 
 
-    <!-- 設備撮影 -->
+    <!-- ================================= -->
+    <!-- 写真撮影 -->
+    <!-- ================================= -->
 
     <section
         id="photoSection"
         class="card hidden">
 
-        <h2>③ 設備写真撮影</h2>
+        <h2>
+            ② 設備写真撮影
+        </h2>
 
-        <div class="current-asset">
+        <div
+            class="current-asset">
 
             <div class="label">
+
                 固定資産番号
+
             </div>
 
             <div
                 id="currentAssetNo"
                 class="asset-large">
+
             </div>
 
         </div>
@@ -150,7 +122,6 @@
 
         <div class="camera-container">
 
-            <!-- 修正 -->
             <video
                 id="photoVideo"
                 autoplay
@@ -166,22 +137,31 @@
         </div>
 
 
-        <div class="photo-counter">
+        <div
+            class="photo-counter">
 
             撮影枚数：
-            <span id="photoCount">0</span>
+
+            <span id="photoCount">
+                0
+            </span>
+
             枚
 
         </div>
 
 
-        <div class="photo-preview-container">
+        <div
+            class="photo-preview-container">
 
-            <h3>撮影済写真</h3>
+            <h3>
+                撮影済写真
+            </h3>
 
             <div
                 id="photoPreviewList"
                 class="photo-preview-list">
+
             </div>
 
         </div>
@@ -192,19 +172,25 @@
             <button
                 id="mainPhotoBtn"
                 class="primary-button">
+
                 全体像撮影
+
             </button>
 
             <button
                 id="additionalPhotoBtn"
                 class="secondary-button">
+
                 追加で撮影
+
             </button>
 
             <button
                 id="finishAssetBtn"
                 class="success-button">
+
                 撮影終了
+
             </button>
 
         </div>
@@ -212,36 +198,59 @@
     </section>
 
 
-    <!-- 一覧 -->
+    <!-- ================================= -->
+    <!-- 棚卸済一覧 -->
+    <!-- ================================= -->
 
     <section class="card">
 
-        <div class="list-header">
+        <div
+            class="list-header">
 
-            <h2>棚卸済一覧</h2>
+            <h2>
+                棚卸済一覧
+            </h2>
 
             <button
                 id="exportCsvBtn"
                 class="secondary-button">
+
                 CSV出力
+
             </button>
 
         </div>
 
-        <div class="table-wrapper">
+        <div
+            class="table-wrapper">
 
-            <table id="assetTable">
+            <table>
 
                 <thead>
+
                     <tr>
+
                         <th>No</th>
-                        <th>固定資産番号</th>
-                        <th>撮影枚数</th>
-                        <th>読取日時</th>
+
+                        <th>
+                            固定資産番号
+                        </th>
+
+                        <th>
+                            撮影枚数
+                        </th>
+
+                        <th>
+                            日時
+                        </th>
+
                     </tr>
+
                 </thead>
 
-                <tbody id="assetTableBody">
+                <tbody
+                    id="assetTableBody">
+
                 </tbody>
 
             </table>
@@ -253,43 +262,68 @@
 </main>
 
 
-<!-- 終了確認 -->
+<!-- ================================= -->
+<!-- 撮影終了確認 -->
+<!-- ================================= -->
 
 <div
     id="finishModal"
     class="modal hidden">
 
-    <div class="modal-content">
+    <div
+        class="modal-content">
 
-        <h2>撮影終了確認</h2>
+        <h2>
+            撮影終了確認
+        </h2>
 
         <p>
+
             この固定資産の撮影を終了しますか？
+
         </p>
 
         <p>
+
             固定資産番号：
-            <span id="finishAssetNo"></span>
+
+            <span id="finishAssetNo">
+            </span>
+
         </p>
 
         <p>
+
             撮影枚数：
-            <span id="finishPhotoCount">0</span>
+
+            <span
+                id="finishPhotoCount">
+
+                0
+
+            </span>
+
             枚
+
         </p>
 
-        <div class="button-group">
+        <div
+            class="button-group">
 
             <button
                 id="cancelFinishBtn"
                 class="secondary-button">
+
                 戻る
+
             </button>
 
             <button
                 id="confirmFinishBtn"
                 class="success-button">
+
                 終了する
+
             </button>
 
         </div>
@@ -299,18 +333,24 @@
 </div>
 
 
-<!-- OCRローディング -->
+<!-- ================================= -->
+<!-- ローディング -->
+<!-- ================================= -->
 
 <div
     id="loadingOverlay"
     class="loading-overlay hidden">
 
-    <div class="loading-box">
+    <div
+        class="loading-box">
 
-        <div class="spinner"></div>
+        <div
+            class="spinner">
+
+        </div>
 
         <p>
-            OCR解析中...
+            処理中...
         </p>
 
     </div>
