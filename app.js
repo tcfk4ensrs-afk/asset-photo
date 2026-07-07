@@ -36,21 +36,30 @@ async function startCamera() {
 
     try {
 
+        // 既存ストリームを停止
+        if (videoStream) {
+            videoStream.getTracks().forEach(
+                track => track.stop()
+            );
+        }
+
         videoStream =
             await navigator.mediaDevices.getUserMedia({
                 video: {
-    facingMode: {
-        exact: "environment"
-    }
-}
+                    facingMode: {
+                        exact: "environment"
+                    }
+                }
             });
 
         if (ocrVideo) {
-            ocrVideo.srcObject = videoStream;
+            ocrVideo.srcObject =
+                videoStream;
         }
 
         if (photoVideo) {
-            photoVideo.srcObject = videoStream;
+            photoVideo.srcObject =
+                videoStream;
         }
 
     } catch (err) {
@@ -58,12 +67,11 @@ async function startCamera() {
         console.error(err);
 
         alert(
-            "カメラ起動失敗\n\n" +
+            "外カメラ取得失敗\n\n" +
             err.message
         );
 
     }
-
 }
 
 scanButton.addEventListener("click", async () => {
