@@ -36,19 +36,20 @@ async function startCamera() {
 
     try {
 
-        // 既存ストリームを停止
         if (videoStream) {
-            videoStream.getTracks().forEach(
-                track => track.stop()
-            );
+
+            videoStream
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
         }
 
         videoStream =
             await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: {
-                        exact: "environment"
-                    }
+                    facingMode: "environment"
                 }
             });
 
@@ -62,18 +63,19 @@ async function startCamera() {
                 videoStream;
         }
 
-    } catch (err) {
+    }
+    catch (err) {
 
         console.error(err);
 
         alert(
-            "外カメラ取得失敗\n\n" +
+            "カメラ起動失敗\n\n" +
             err.message
         );
 
     }
-}
 
+}
 scanButton.addEventListener(
     "click",
     async () => {
@@ -90,18 +92,6 @@ scanButton.addEventListener(
                     ocrCanvas
                 );
 
-            const debugImage =
-                document.getElementById(
-                    "debugImage"
-                );
-
-            if (debugImage) {
-
-                debugImage.src =
-                    imageData;
-
-            }
-
             const result =
                 await Tesseract.recognize(
                     imageData,
@@ -112,7 +102,7 @@ scanButton.addEventListener(
                 result.data.text || "";
 
             console.log(
-                "OCR生データ:",
+                "OCR結果:",
                 text
             );
 
@@ -136,7 +126,6 @@ scanButton.addEventListener(
                 );
 
                 return;
-
             }
 
             currentAssetNo =
@@ -174,8 +163,7 @@ scanButton.addEventListener(
 
     }
 );
-
-function captureFromVideo(
+function captureAssetNumberOnly(
     video,
     canvas
 ) {
@@ -196,13 +184,6 @@ function captureFromVideo(
         0,
         0
     );
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        1
-    );
-
-}
 
     const frame =
         ctx.getImageData(
@@ -243,20 +224,11 @@ function captureFromVideo(
                     x
                 ) * 4;
 
-            const r =
-                data[i];
-
-            const g =
-                data[i + 1];
-
-            const b =
-                data[i + 2];
-
             const brightness =
                 (
-                    r +
-                    g +
-                    b
+                    data[i] +
+                    data[i + 1] +
+                    data[i + 2]
                 ) / 3;
 
             if (
@@ -337,6 +309,34 @@ function captureFromVideo(
             );
 
     }
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        1
+    );
+
+}
+function captureFromVideo(
+    video,
+    canvas
+) {
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+    ctx.drawImage(
+        video,
+        0,
+        0
+    );
 
     return canvas.toDataURL(
         "image/jpeg",
