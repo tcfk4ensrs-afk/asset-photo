@@ -7,27 +7,32 @@
 
     <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<script src="app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    app.js" defer></script>
 </head>
+
 <body>
 
 <header>
+
     <h1>固定資産棚卸システム</h1>
 
     <div class="summary-card">
-        <div class="summary-title">棚卸済件数</div>
+        <div class="summary-title">
+            棚卸済件数
+        </div>
+
         <div id="assetCount" class="summary-value">
             0件
         </div>
     </div>
+
 </header>
 
 
 <main>
 
-    <!-- OCRステップ -->
+    <!-- OCR読取 -->
     <section id="ocrSection" class="card">
 
         <h2>① 管理プレート読取</h2>
@@ -41,6 +46,11 @@
                 muted>
             </video>
 
+            <!-- OCRガイド -->
+            <div class="ocr-target-box">
+                固定No.の黒い帯をこの枠に合わせる
+            </div>
+
             <canvas
                 id="ocrCanvas"
                 hidden>
@@ -48,33 +58,54 @@
 
         </div>
 
-        <button id="scanButton" class="primary-button">
+        <button
+            id="scanButton"
+            class="primary-button">
             プレートを撮影
         </button>
 
-        <div id="ocrStatus" class="status">
-            固定資産管理プレートをカメラに映してください
+        <div
+            id="ocrStatus"
+            class="status">
+
+            固定資産番号の黒い帯を
+            ガイド枠に合わせて撮影してください
+
+        </div>
+
+        <!-- OCRデバッグ画像 -->
+        <div class="debug-container">
+
+            <h3>OCR対象画像</h3>
+
+            <img
+                id="debugImage"
+                class="debug-image">
+
         </div>
 
     </section>
 
 
     <!-- OCR確認 -->
-    <section id="confirmSection" class="card hidden">
+
+    <section
+        id="confirmSection"
+        class="card hidden">
 
         <h2>② 認識結果確認</h2>
 
         <div
-    id="assetResultBox"
-    class="asset-number-box">
+            id="assetResultBox"
+            class="asset-number-box">
 
-    <span id="recognizedAssetNo">
-        ------
-    </span>
+            <span id="recognizedAssetNo">
+                ------
+            </span>
 
-</div>
+        </div>
 
-<p id="ocrResultMessage"></p>
+        <p id="ocrResultMessage"></p>
 
         <div class="button-group">
 
@@ -95,8 +126,11 @@
     </section>
 
 
-    <!-- 撮影モード -->
-    <section id="photoSection" class="card hidden">
+    <!-- 設備撮影 -->
+
+    <section
+        id="photoSection"
+        class="card hidden">
 
         <h2>③ 設備写真撮影</h2>
 
@@ -106,31 +140,31 @@
                 固定資産番号
             </div>
 
-            <div id="currentAssetNo" class="asset-large">
-                10001116
+            <div
+                id="currentAssetNo"
+                class="asset-large">
             </div>
 
         </div>
 
+
         <div class="camera-container">
 
-    <video
-        id="ocrVideo"
-        autoplay
-        playsinline
-        muted>
-    </video>
+            <!-- 修正 -->
+            <video
+                id="photoVideo"
+                autoplay
+                playsinline
+                muted>
+            </video>
 
-    <div class="ocr-target-box">
-        8桁番号をこの枠内に合わせる
-    </div>
+            <canvas
+                id="photoCanvas"
+                hidden>
+            </canvas>
 
-    <canvas
-        id="ocrCanvas"
-        hidden>
-    </canvas>
+        </div>
 
-</div>
 
         <div class="photo-counter">
 
@@ -139,18 +173,19 @@
             枚
 
         </div>
-        <!-- 撮影済サムネイル -->
 
-<div class="photo-preview-container">
 
-    <h3>撮影済写真</h3>
+        <div class="photo-preview-container">
 
-    <div id="photoPreviewList"
-         class="photo-preview-list">
+            <h3>撮影済写真</h3>
 
-    </div>
+            <div
+                id="photoPreviewList"
+                class="photo-preview-list">
+            </div>
 
-</div>
+        </div>
+
 
         <div class="button-stack">
 
@@ -177,8 +212,8 @@
     </section>
 
 
+    <!-- 一覧 -->
 
-    <!-- 棚卸済一覧 -->
     <section class="card">
 
         <div class="list-header">
@@ -198,18 +233,15 @@
             <table id="assetTable">
 
                 <thead>
-                <tr>
-                    <th>No</th>
-                    <th>固定資産番号</th>
-                    <th>撮影枚数</th>
-                    <th>読取日時</th>
-                </tr>
+                    <tr>
+                        <th>No</th>
+                        <th>固定資産番号</th>
+                        <th>撮影枚数</th>
+                        <th>読取日時</th>
+                    </tr>
                 </thead>
 
                 <tbody id="assetTableBody">
-
-                <!-- JSで追加 -->
-
                 </tbody>
 
             </table>
@@ -219,10 +251,13 @@
     </section>
 
 </main>
-<!-- 撮影終了確認 -->
 
-<div id="finishModal"
-     class="modal hidden">
+
+<!-- 終了確認 -->
+
+<div
+    id="finishModal"
+    class="modal hidden">
 
     <div class="modal-content">
 
@@ -245,13 +280,15 @@
 
         <div class="button-group">
 
-            <button id="cancelFinishBtn"
-                    class="secondary-button">
+            <button
+                id="cancelFinishBtn"
+                class="secondary-button">
                 戻る
             </button>
 
-            <button id="confirmFinishBtn"
-                    class="success-button">
+            <button
+                id="confirmFinishBtn"
+                class="success-button">
                 終了する
             </button>
 
@@ -261,8 +298,12 @@
 
 </div>
 
-<!-- ローディング -->
-<div id="loadingOverlay" class="loading-overlay hidden">
+
+<!-- OCRローディング -->
+
+<div
+    id="loadingOverlay"
+    class="loading-overlay hidden">
 
     <div class="loading-box">
 
