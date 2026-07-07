@@ -1,19 +1,10 @@
-// =====================================
-// グローバル
-// =====================================
+// app.js 修正版（OCRデバッグ版）
 
 let currentAssetNo = "";
 let currentPhotoCount = 0;
-
 let scannedAssets = [];
 let currentPhotos = [];
-
 let videoStream = null;
-
-
-// =====================================
-// DOM
-// =====================================
 
 const ocrSection = document.getElementById("ocrSection");
 const confirmSection = document.getElementById("confirmSection");
@@ -29,656 +20,100 @@ const scanButton = document.getElementById("scanButton");
 const retryButton = document.getElementById("retryButton");
 const confirmButton = document.getElementById("confirmButton");
 
-const recognizedAssetNo =
-    document.getElementById("recognizedAssetNo");
+const recognizedAssetNo = document.getElementById("recognizedAssetNo");
+const currentAssetNoLabel = document.getElementById("currentAssetNo");
+const photoCountLabel = document.getElementById("photoCount");
+const photoPreviewList = document.getElementById("photoPreviewList");
+const assetTableBody = document.getElementById("assetTableBody");
+const assetCount = document.getElementById("assetCount");
+const loadingOverlay = document.getElementById("loadingOverlay");
 
-const currentAssetNoLabel =
-    document.getElementById("currentAssetNo");
-
-const photoCountLabel =
-    document.getElementById("photoCount");
-
-const photoPreviewList =
-    document.getElementById("photoPreviewList");
-
-const assetTableBody =
-    document.getElementById("assetTableBody");
-
-const assetCount =
-    document.getElementById("assetCount");
-
-const loadingOverlay =
-    document.getElementById("loadingOverlay");
-
-const finishModal =
-    document.getElementById("finishModal");
-
-const finishAssetNo =
-    document.getElementById("finishAssetNo");
-
-const finishPhotoCount =
-    document.getElementById("finishPhotoCount");
-
-const finishAssetBtn =
-    document.getElementById("finishAssetBtn");
-
-const cancelFinishBtn =
-    document.getElementById("cancelFinishBtn");
-
-const confirmFinishBtn =
-    document.getElementById("confirmFinishBtn");
-
-const exportCsvBtn =
-    document.getElementById("exportCsvBtn");
-
-const mainPhotoBtn =
-    document.getElementById("mainPhotoBtn");
-
-const additionalPhotoBtn =
-    document.getElementById("additionalPhotoBtn");
-
-
-// =====================================
-// 初期化
-// =====================================
-
-window.addEventListener(
-    "load",
-    async () => {
-
-        await startCamera();
-
-    }
-);
-
-
-// =====================================
-// カメラ起動
-// =====================================
+window.addEventListener("load", async () => {
+    await startCamera();
+});
 
 async function startCamera() {
+    try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
+
+        if (ocrVideo) ocrVideo.srcObject = videoStream;
+        if (photoVideo) photoVideo.srcObject = videoStream;
+
+    } catch (err) {
+        console.error(err);
+        alert("カメラ起動失敗\n\n" + err.message);
+    }
+}
+
+scanButton.addEventListener("click", async () => {
+
+    loadingOverlay.classList.remove("hidden");
 
     try {
 
-        videoStream =
-            await navigator
-                .mediaDevices
-                .getUserMedia({
-                    video: true
-                });
-
-        console.log(
-            "ocrVideo",
-            ocrVideo
+        const imageData = captureFromVideo(
+            ocrVideo,
+            ocrCanvas
         );
 
-        console.log(
-            "photoVideo",
-            photoVideo
+        const debugImage = document.getElementById("debugImage");
+        if (debugImage) {
+            debugImage.src = imageData;
+        }
+
+        const result = await Tesseract.recognize(
+            imageData,
+            "jpn+eng"
         );
 
-        if (ocrVideo) {
-            ocrVideo.srcObject =
-                videoStream;
-        }
+        let text = result.data.text;
 
-        if (photoVideo) {
-            photoVideo.srcObject =
-                videoStream;
-        }
+        console.log("OCR結果", text);
 
-    }
-    catch (err) {
-
-        console.error(err);
+        const digits = text.replace(/\D/g, "");
 
         alert(
-            "カメラ起動失敗\n\n" +
-            err.message
+            "OCR結果\n\n" +
+            text +
+            "\n\n数字抽出\n\n" +
+            digits
         );
 
-    }
+        const match = digits.match(/\d{8}/);
 
-}
-
-
-// =====================================
-// OCR撮影
-// =====================================
-
-scanButton.addEventListener(
-    "click",
-    async () => {
-
-        loadingOverlay.classList.remove(
-            "hidden"
-        );
-
-        try {
-
-            const imageData =
-                captureAssetNumberOnly(
-                    ocrVideo,
-                    ocrCanvas
-                );
-
-            const result =
-    await Tesseract.recognize(
-        imageData,
-        "eng"
-    );
-
-            let text =
-    result.data.text;
-
-console.log(text);
-
-text =
-    text.replace(/\D/g, "");
-
-alert(
-    "OCR結果\n\n" +
-    text
-);
-
-            text =
-                text.replace(/\D/g, "");
-
-            alert(
-                "OCR認識結果\n\n" +
-                text
-            );
-
-            const match =
-                text.match(/\d{8}/);
-
-            if (!match) {
-
-                alert(
-                    "固定資産番号を認識できませんでした。\n\n認識結果:\n" +
-                    text
-                );
-
-                return;
-
-            }
-
-            currentAssetNo =
-                match[0];
-
-            recognizedAssetNo.innerText =
-                currentAssetNo;
-
-            ocrSection.classList.add(
-                "hidden"
-            );
-
-            confirmSection.classList.remove(
-                "hidden"
-            );
-
-        }
-        catch (err) {
-
-            console.error(err);
-
-            alert(
-                "OCR処理失敗"
-            );
-
-        }
-        finally {
-
-            loadingOverlay.classList.add(
-                "hidden"
-            );
-
+        if (!match) {
+            alert("固定資産番号を認識できませんでした");
+            return;
         }
 
-    }
-);
+        currentAssetNo = match[0];
+        recognizedAssetNo.innerText = currentAssetNo;
 
-// =====================================
-// OCR再読取
-// =====================================
+        ocrSection.classList.add("hidden");
+        confirmSection.classList.remove("hidden");
 
-retryButton.addEventListener(
-    "click",
-    () => {
+    } catch (err) {
 
-        confirmSection.classList.add(
-            "hidden"
-        );
+        console.error(err);
+        alert("OCR処理失敗\n\n" + err.message);
 
-        ocrSection.classList.remove(
-            "hidden"
-        );
+    } finally {
+
+        loadingOverlay.classList.add("hidden");
 
     }
-);
+});
 
+function captureFromVideo(video, canvas) {
 
-// =====================================
-// 番号OK
-// =====================================
+    const ctx = canvas.getContext("2d");
 
-confirmButton.addEventListener(
-    "click",
-    () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-        confirmSection.classList.add(
-            "hidden"
-        );
+    ctx.drawImage(video, 0, 0);
 
-        photoSection.classList.remove(
-            "hidden"
-        );
-
-        currentAssetNoLabel.innerText =
-            currentAssetNo;
-
-        currentPhotoCount = 0;
-
-        photoCountLabel.innerText = 0;
-
-        photoPreviewList.innerHTML = "";
-
-        currentPhotos = [];
-
-    }
-);
-
-
-// =====================================
-// 全体写真撮影
-// =====================================
-
-mainPhotoBtn.addEventListener(
-    "click",
-    takePhoto
-);
-
-additionalPhotoBtn.addEventListener(
-    "click",
-    takePhoto
-);
-
-
-// =====================================
-// 写真撮影
-// =====================================
-
-function takePhoto() {
-
-    const imageData =
-        captureFromVideo(
-            photoVideo,
-            photoCanvas
-        );
-
-    currentPhotoCount++;
-
-    photoCountLabel.innerText =
-        currentPhotoCount;
-
-    currentPhotos.push(
-        imageData
-    );
-
-    addThumbnail(imageData);
-
-    downloadImage(
-        imageData,
-        currentAssetNo,
-        currentPhotoCount
-    );
-
+    return canvas.toDataURL("image/jpeg", 1.0);
 }
-
-
-// =====================================
-// キャプチャ
-// =====================================
-
-// =====================================
-// 固定資産番号専用切り出し
-// =====================================
-
-function captureAssetNumberOnly(
-    video,
-    canvas
-) {
-
-    const ctx =
-        canvas.getContext("2d");
-
-    const cropX =
-        video.videoWidth * 0.25;
-
-    const cropY =
-        video.videoHeight * 0.40;
-
-    const cropWidth =
-        video.videoWidth * 0.50;
-
-    const cropHeight =
-        video.videoHeight * 0.15;
-
-    canvas.width =
-        cropWidth;
-
-    canvas.height =
-        cropHeight;
-
-    ctx.drawImage(
-        video,
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        cropWidth,
-        cropHeight
-    );
-
-    const imageData =
-        ctx.getImageData(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-    const data =
-        imageData.data;
-
-    for (
-        let i = 0;
-        i < data.length;
-        i += 4
-    ) {
-
-        const gray =
-            (
-                data[i] +
-                data[i + 1] +
-                data[i + 2]
-            ) / 3;
-
-        const value =
-            gray > 100
-                ? 255
-                : 0;
-
-        data[i] = value;
-        data[i + 1] = value;
-        data[i + 2] = value;
-
-    }
-
-    ctx.putImageData(
-        imageData,
-        0,
-        0
-    );
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        1.0
-    );
-
-}
-
-
-// =====================================
-// サムネイル
-// =====================================
-
-function addThumbnail(dataUrl) {
-
-    const div =
-        document.createElement("div");
-
-    div.className =
-        "photo-preview-item";
-
-    const img =
-        document.createElement("img");
-
-    img.src =
-        dataUrl;
-
-    div.appendChild(img);
-
-    photoPreviewList.appendChild(
-        div
-    );
-
-}
-
-
-// =====================================
-// 保存
-// =====================================
-
-function downloadImage(
-    dataUrl,
-    assetNo,
-    index
-) {
-
-    const a =
-        document.createElement("a");
-
-    a.href =
-        dataUrl;
-
-    const name =
-        `${assetNo}_${String(index).padStart(2,"0")}.jpg`;
-
-    a.download =
-        name;
-
-    a.click();
-
-}
-
-
-// =====================================
-// 撮影終了
-// =====================================
-
-finishAssetBtn.addEventListener(
-    "click",
-    () => {
-
-        finishAssetNo.innerText =
-            currentAssetNo;
-
-        finishPhotoCount.innerText =
-            currentPhotoCount;
-
-        finishModal.classList.remove(
-            "hidden"
-        );
-
-    }
-);
-
-
-// =====================================
-// 戻る
-// =====================================
-
-cancelFinishBtn.addEventListener(
-    "click",
-    () => {
-
-        finishModal.classList.add(
-            "hidden"
-        );
-
-    }
-);
-
-
-// =====================================
-// 終了確定
-// =====================================
-
-confirmFinishBtn.addEventListener(
-    "click",
-    () => {
-
-        finishModal.classList.add(
-            "hidden"
-        );
-
-        addAssetRow();
-
-        resetWorkflow();
-
-    }
-);
-
-
-// =====================================
-// 一覧追加
-// =====================================
-
-function addAssetRow() {
-
-    scannedAssets.push({
-
-        assetNo:
-            currentAssetNo,
-
-        photoCount:
-            currentPhotoCount,
-
-        date:
-            new Date()
-                .toLocaleString(
-                    "ja-JP"
-                )
-
-    });
-
-    refreshTable();
-
-}
-
-
-// =====================================
-// テーブル更新
-// =====================================
-
-function refreshTable() {
-
-    assetTableBody.innerHTML =
-        "";
-
-    scannedAssets.forEach(
-        (item,index)=>{
-
-            const tr =
-                document
-                .createElement("tr");
-
-            tr.innerHTML =
-            `
-            <td>${index+1}</td>
-            <td>${item.assetNo}</td>
-            <td>${item.photoCount}</td>
-            <td>${item.date}</td>
-            `;
-
-            assetTableBody
-                .appendChild(tr);
-
-        }
-    );
-
-    assetCount.innerText =
-        scannedAssets.length +
-        "件";
-
-}
-
-
-// =====================================
-// 初期状態へ戻す
-// =====================================
-
-function resetWorkflow() {
-
-    currentAssetNo = "";
-
-    currentPhotoCount = 0;
-
-    currentPhotos = [];
-
-    photoPreviewList.innerHTML = "";
-
-    photoSection.classList.add(
-        "hidden"
-    );
-
-    confirmSection.classList.add(
-        "hidden"
-    );
-
-    ocrSection.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-// =====================================
-// CSV出力
-// =====================================
-
-exportCsvBtn.addEventListener(
-    "click",
-    () => {
-
-        let csv =
-            "固定資産番号,撮影枚数,読取日時\n";
-
-        scannedAssets.forEach(
-            item => {
-
-                csv +=
-                    `${item.assetNo},${item.photoCount},${item.date}\n`;
-
-            }
-        );
-
-        const blob =
-            new Blob(
-                [csv],
-                {
-                    type:
-                    "text/csv;charset=utf-8;"
-                }
-            );
-
-        const url =
-            URL.createObjectURL(blob);
-
-        const a =
-            document
-            .createElement("a");
-
-        a.href =
-            url;
-
-        a.download =
-            "棚卸結果.csv";
-
-        a.click();
-
-    }
-);
