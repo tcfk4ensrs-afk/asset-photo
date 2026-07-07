@@ -1,36 +1,138 @@
-// app.js 修正版（OCRデバッグ版）
+// =====================================
+// グローバル変数
+// =====================================
 
 let currentAssetNo = "";
 let currentPhotoCount = 0;
+
 let scannedAssets = [];
 let currentPhotos = [];
+
 let videoStream = null;
 
-const ocrSection = document.getElementById("ocrSection");
-const confirmSection = document.getElementById("confirmSection");
-const photoSection = document.getElementById("photoSection");
 
-const ocrVideo = document.getElementById("ocrVideo");
-const ocrCanvas = document.getElementById("ocrCanvas");
+// =====================================
+// DOM
+// =====================================
 
-const photoVideo = document.getElementById("photoVideo");
-const photoCanvas = document.getElementById("photoCanvas");
+const inputSection =
+    document.getElementById(
+        "inputSection"
+    );
 
-const scanButton = document.getElementById("scanButton");
-const retryButton = document.getElementById("retryButton");
-const confirmButton = document.getElementById("confirmButton");
+const photoSection =
+    document.getElementById(
+        "photoSection"
+    );
 
-const recognizedAssetNo = document.getElementById("recognizedAssetNo");
-const currentAssetNoLabel = document.getElementById("currentAssetNo");
-const photoCountLabel = document.getElementById("photoCount");
-const photoPreviewList = document.getElementById("photoPreviewList");
-const assetTableBody = document.getElementById("assetTableBody");
-const assetCount = document.getElementById("assetCount");
-const loadingOverlay = document.getElementById("loadingOverlay");
+const photoVideo =
+    document.getElementById(
+        "photoVideo"
+    );
 
-window.addEventListener("load", async () => {
-    await startCamera();
-});
+const photoCanvas =
+    document.getElementById(
+        "photoCanvas"
+    );
+
+const manualAssetNo =
+    document.getElementById(
+        "manualAssetNo"
+    );
+
+const manualConfirmBtn =
+    document.getElementById(
+        "manualConfirmBtn"
+    );
+
+const currentAssetNoLabel =
+    document.getElementById(
+        "currentAssetNo"
+    );
+
+const photoCountLabel =
+    document.getElementById(
+        "photoCount"
+    );
+
+const photoPreviewList =
+    document.getElementById(
+        "photoPreviewList"
+    );
+
+const assetTableBody =
+    document.getElementById(
+        "assetTableBody"
+    );
+
+const assetCount =
+    document.getElementById(
+        "assetCount"
+    );
+
+const finishModal =
+    document.getElementById(
+        "finishModal"
+    );
+
+const finishAssetNo =
+    document.getElementById(
+        "finishAssetNo"
+    );
+
+const finishPhotoCount =
+    document.getElementById(
+        "finishPhotoCount"
+    );
+
+const finishAssetBtn =
+    document.getElementById(
+        "finishAssetBtn"
+    );
+
+const cancelFinishBtn =
+    document.getElementById(
+        "cancelFinishBtn"
+    );
+
+const confirmFinishBtn =
+    document.getElementById(
+        "confirmFinishBtn"
+    );
+
+const exportCsvBtn =
+    document.getElementById(
+        "exportCsvBtn"
+    );
+
+const mainPhotoBtn =
+    document.getElementById(
+        "mainPhotoBtn"
+    );
+
+const additionalPhotoBtn =
+    document.getElementById(
+        "additionalPhotoBtn"
+    );
+
+
+// =====================================
+// 初期化
+// =====================================
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        await startCamera();
+
+    }
+);
+
+
+// =====================================
+// カメラ起動
+// =====================================
 
 async function startCamera() {
 
@@ -47,20 +149,22 @@ async function startCamera() {
         }
 
         videoStream =
-            await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: "environment"
-                }
-            });
+            await navigator
+                .mediaDevices
+                .getUserMedia({
 
-        if (ocrVideo) {
-            ocrVideo.srcObject =
-                videoStream;
-        }
+                    video: {
+                        facingMode:
+                            "environment"
+                    }
+
+                });
 
         if (photoVideo) {
+
             photoVideo.srcObject =
                 videoStream;
+
         }
 
     }
@@ -76,246 +180,109 @@ async function startCamera() {
     }
 
 }
-scanButton.addEventListener(
-    "click",
-    async () => {
 
-        loadingOverlay.classList.remove(
+
+// =====================================
+// 固定資産番号入力
+// =====================================
+
+manualConfirmBtn.addEventListener(
+    "click",
+    () => {
+
+        const value =
+            manualAssetNo.value
+                .trim();
+
+        if (
+            value.length === 0
+        ) {
+
+            alert(
+                "固定資産番号を入力してください"
+            );
+
+            return;
+
+        }
+
+        currentAssetNo =
+            value;
+
+        currentAssetNoLabel.innerText =
+            currentAssetNo;
+
+        currentPhotoCount = 0;
+
+        currentPhotos = [];
+
+        photoPreviewList.innerHTML = "";
+
+        photoCountLabel.innerText =
+            "0";
+
+        manualAssetNo.value = "";
+
+        inputSection.classList.add(
             "hidden"
         );
 
-        try {
-
-            const imageData =
-                captureAssetNumberOnly(
-                    ocrVideo,
-                    ocrCanvas
-                );
-
-            const result =
-                await Tesseract.recognize(
-                    imageData,
-                    "eng"
-                );
-
-            let text =
-                result.data.text || "";
-
-            console.log(
-                "OCR結果:",
-                text
-            );
-
-            text =
-                text.replace(
-                    /\D/g,
-                    ""
-                );
-
-            console.log(
-                "数字抽出:",
-                text
-            );
-
-            if (
-                text.length === 0
-            ) {
-
-                alert(
-                    "番号を認識できませんでした"
-                );
-
-                return;
-            }
-
-            currentAssetNo =
-                text;
-
-            recognizedAssetNo.innerText =
-                currentAssetNo;
-
-            ocrSection.classList.add(
-                "hidden"
-            );
-
-            confirmSection.classList.remove(
-                "hidden"
-            );
-
-        }
-        catch (err) {
-
-            console.error(err);
-
-            alert(
-                "OCR処理失敗\n\n" +
-                err.message
-            );
-
-        }
-        finally {
-
-            loadingOverlay.classList.add(
-                "hidden"
-            );
-
-        }
+        photoSection.classList.remove(
+            "hidden"
+        );
 
     }
 );
-function captureAssetNumberOnly(
-    video,
-    canvas
-) {
 
-    const ctx =
-        canvas.getContext(
-            "2d"
+
+// =====================================
+// 写真撮影
+// =====================================
+
+mainPhotoBtn.addEventListener(
+    "click",
+    takePhoto
+);
+
+additionalPhotoBtn.addEventListener(
+    "click",
+    takePhoto
+);
+
+function takePhoto() {
+
+    const imageData =
+        captureFromVideo(
+            photoVideo,
+            photoCanvas
         );
 
-    canvas.width =
-        video.videoWidth;
+    currentPhotoCount++;
 
-    canvas.height =
-        video.videoHeight;
+    photoCountLabel.innerText =
+        currentPhotoCount;
 
-    ctx.drawImage(
-        video,
-        0,
-        0
+    currentPhotos.push(
+        imageData
     );
 
-    const frame =
-        ctx.getImageData(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-    const data =
-        frame.data;
-
-    let minX =
-        canvas.width;
-
-    let minY =
-        canvas.height;
-
-    let maxX = 0;
-    let maxY = 0;
-
-    for (
-        let y = 0;
-        y < canvas.height;
-        y++
-    ) {
-
-        for (
-            let x = 0;
-            x < canvas.width;
-            x++
-        ) {
-
-            const i =
-                (
-                    y *
-                    canvas.width +
-                    x
-                ) * 4;
-
-            const brightness =
-                (
-                    data[i] +
-                    data[i + 1] +
-                    data[i + 2]
-                ) / 3;
-
-            if (
-                brightness < 80
-            ) {
-
-                if (x < minX)
-                    minX = x;
-
-                if (y < minY)
-                    minY = y;
-
-                if (x > maxX)
-                    maxX = x;
-
-                if (y > maxY)
-                    maxY = y;
-
-            }
-
-        }
-
-    }
-
-    const cropX =
-        Math.max(
-            0,
-            minX - 20
-        );
-
-    const cropY =
-        Math.max(
-            0,
-            minY - 20
-        );
-
-    const cropWidth =
-        Math.max(
-            300,
-            maxX - minX + 40
-        );
-
-    const cropHeight =
-        Math.max(
-            60,
-            maxY - minY + 40
-        );
-
-    canvas.width =
-        cropWidth * 4;
-
-    canvas.height =
-        cropHeight * 4;
-
-    ctx.drawImage(
-        video,
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    addThumbnail(
+        imageData
     );
 
-    const debugImage =
-        document.getElementById(
-            "debugImage"
-        );
-
-    if (debugImage) {
-
-        debugImage.src =
-            canvas.toDataURL(
-                "image/jpeg",
-                1
-            );
-
-    }
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        1
+    downloadImage(
+        imageData,
+        currentAssetNo,
+        currentPhotoCount
     );
 
 }
+
+
+// =====================================
+// 画像取得
+// =====================================
+
 function captureFromVideo(
     video,
     canvas
@@ -340,7 +307,273 @@ function captureFromVideo(
 
     return canvas.toDataURL(
         "image/jpeg",
-        1
+        1.0
     );
 
 }
+
+
+// =====================================
+// サムネイル追加
+// =====================================
+
+function addThumbnail(
+    dataUrl
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "photo-preview-item";
+
+    const img =
+        document.createElement(
+            "img"
+        );
+
+    img.src =
+        dataUrl;
+
+    div.appendChild(
+        img
+    );
+
+    photoPreviewList.appendChild(
+        div
+    );
+
+}
+
+
+// =====================================
+// 写真保存
+// =====================================
+
+function downloadImage(
+    dataUrl,
+    assetNo,
+    index
+) {
+
+    const a =
+        document.createElement(
+            "a"
+        );
+
+    a.href =
+        dataUrl;
+
+    a.download =
+        `${assetNo}_${String(index)
+            .padStart(2, "0")}.jpg`;
+
+    a.click();
+
+}
+
+
+// =====================================
+// 撮影終了確認
+// =====================================
+
+finishAssetBtn.addEventListener(
+    "click",
+    () => {
+
+        finishAssetNo.innerText =
+            currentAssetNo;
+
+        finishPhotoCount.innerText =
+            currentPhotoCount;
+
+        finishModal.classList.remove(
+            "hidden"
+        );
+
+    }
+);
+
+
+// =====================================
+// モーダル閉じる
+// =====================================
+
+cancelFinishBtn.addEventListener(
+    "click",
+    () => {
+
+        finishModal.classList.add(
+            "hidden"
+        );
+
+    }
+);
+
+
+// =====================================
+// 撮影完了
+// =====================================
+
+confirmFinishBtn.addEventListener(
+    "click",
+    () => {
+
+        finishModal.classList.add(
+            "hidden"
+        );
+
+        addAssetRow();
+
+        resetWorkflow();
+
+    }
+);
+
+
+// =====================================
+// 一覧追加
+// =====================================
+
+function addAssetRow() {
+
+    scannedAssets.push({
+
+        assetNo:
+            currentAssetNo,
+
+        photoCount:
+            currentPhotoCount,
+
+        date:
+            new Date()
+                .toLocaleString(
+                    "ja-JP"
+                )
+
+    });
+
+    refreshTable();
+
+}
+
+
+// =====================================
+// テーブル更新
+// =====================================
+
+function refreshTable() {
+
+    assetTableBody.innerHTML =
+        "";
+
+    scannedAssets.forEach(
+        (
+            item,
+            index
+        ) => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+            tr.innerHTML =
+                `
+                <td>${index + 1}</td>
+                <td>${item.assetNo}</td>
+                <td>${item.photoCount}</td>
+                <td>${item.date}</td>
+                `;
+
+            assetTableBody.appendChild(
+                tr
+            );
+
+        }
+    );
+
+    assetCount.innerText =
+        scannedAssets.length +
+        "件";
+
+}
+
+
+// =====================================
+// 初期化
+// =====================================
+
+function resetWorkflow() {
+
+    currentAssetNo = "";
+
+    currentPhotoCount = 0;
+
+    currentPhotos = [];
+
+    photoPreviewList.innerHTML =
+        "";
+
+    photoSection.classList.add(
+        "hidden"
+    );
+
+    inputSection.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+// =====================================
+// CSV出力
+// =====================================
+
+exportCsvBtn.addEventListener(
+    "click",
+    () => {
+
+        let csv =
+            "固定資産番号,撮影枚数,読取日時\n";
+
+        scannedAssets.forEach(
+            item => {
+
+                csv +=
+                    `${item.assetNo},${item.photoCount},${item.date}\n`;
+
+            }
+        );
+
+        const blob =
+            new Blob(
+                [csv],
+                {
+                    type:
+                        "text/csv;charset=utf-8;"
+                }
+            );
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+        const a =
+            document.createElement(
+                "a"
+            );
+
+        a.href =
+            url;
+
+        a.download =
+            "棚卸結果.csv";
+
+        a.click();
+
+    }
+);
