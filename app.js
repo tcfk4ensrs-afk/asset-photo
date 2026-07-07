@@ -33,18 +33,37 @@ window.addEventListener("load", async () => {
 });
 
 async function startCamera() {
-    try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
-            video: true
-        });
 
-        if (ocrVideo) ocrVideo.srcObject = videoStream;
-        if (photoVideo) photoVideo.srcObject = videoStream;
+    try {
+
+        videoStream =
+            await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment",
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            });
+
+        if (ocrVideo) {
+            ocrVideo.srcObject = videoStream;
+        }
+
+        if (photoVideo) {
+            photoVideo.srcObject = videoStream;
+        }
 
     } catch (err) {
+
         console.error(err);
-        alert("カメラ起動失敗\n\n" + err.message);
+
+        alert(
+            "カメラ起動失敗\n\n" +
+            err.message
+        );
+
     }
+
 }
 
 scanButton.addEventListener("click", async () => {
