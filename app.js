@@ -74,73 +74,273 @@ async function startCamera() {
     }
 }
 
-scanButton.addEventListener("click", async () => {
+scanButton.addEventListener(
+    "click",
+    async () => {
 
-    loadingOverlay.classList.remove("hidden");
-
-    try {
-
-        const imageData = captureFromVideo(
-            ocrVideo,
-            ocrCanvas
+        loadingOverlay.classList.remove(
+            "hidden"
         );
 
-        const debugImage = document.getElementById("debugImage");
-        if (debugImage) {
-            debugImage.src = imageData;
+        try {
+
+            const imageData =
+                captureAssetNumberOnly(
+                    ocrVideo,
+                    ocrCanvas
+                );
+
+            const debugImage =
+                document.getElementById(
+                    "debugImage"
+                );
+
+            if (debugImage) {
+
+                debugImage.src =
+                    imageData;
+
+            }
+
+            const result =
+                await Tesseract.recognize(
+                    imageData,
+                    "eng"
+                );
+
+            let text =
+                result.data.text || "";
+
+            console.log(
+                "OCR生データ:",
+                text
+            );
+
+            text =
+                text.replace(
+                    /\D/g,
+                    ""
+                );
+
+            console.log(
+                "数字抽出:",
+                text
+            );
+
+            if (
+                text.length === 0
+            ) {
+
+                alert(
+                    "番号を認識できませんでした"
+                );
+
+                return;
+
+            }
+
+            currentAssetNo =
+                text;
+
+            recognizedAssetNo.innerText =
+                currentAssetNo;
+
+            ocrSection.classList.add(
+                "hidden"
+            );
+
+            confirmSection.classList.remove(
+                "hidden"
+            );
+
         }
+        catch (err) {
 
-        const result = await Tesseract.recognize(
-            imageData,
-            "jpn+eng"
-        );
+            console.error(err);
 
-        let text = result.data.text;
+            alert(
+                "OCR処理失敗\n\n" +
+                err.message
+            );
 
-        console.log("OCR結果", text);
-
-        const digits = text.replace(/\D/g, "");
-
-        alert(
-            "OCR結果\n\n" +
-            text +
-            "\n\n数字抽出\n\n" +
-            digits
-        );
-
-        const match = digits.match(/\d{8}/);
-
-        if (!match) {
-            alert("固定資産番号を認識できませんでした");
-            return;
         }
+        finally {
 
-        currentAssetNo = match[0];
-        recognizedAssetNo.innerText = currentAssetNo;
+            loadingOverlay.classList.add(
+                "hidden"
+            );
 
-        ocrSection.classList.add("hidden");
-        confirmSection.classList.remove("hidden");
-
-    } catch (err) {
-
-        console.error(err);
-        alert("OCR処理失敗\n\n" + err.message);
-
-    } finally {
-
-        loadingOverlay.classList.add("hidden");
+        }
 
     }
-});
+);
 
-function captureFromVideo(video, canvas) {
+function captureFromVideo(
+    video,
+    canvas
+) {
 
-    const ctx = canvas.getContext("2d");
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width =
+        video.videoWidth;
 
-    ctx.drawImage(video, 0, 0);
+    canvas.height =
+        video.videoHeight;
 
-    return canvas.toDataURL("image/jpeg", 1.0);
+    ctx.drawImage(
+        video,
+        0,
+        0
+    );
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        1
+    );
+
+}
+
+    const frame =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    const data =
+        frame.data;
+
+    let minX =
+        canvas.width;
+
+    let minY =
+        canvas.height;
+
+    let maxX = 0;
+    let maxY = 0;
+
+    for (
+        let y = 0;
+        y < canvas.height;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < canvas.width;
+            x++
+        ) {
+
+            const i =
+                (
+                    y *
+                    canvas.width +
+                    x
+                ) * 4;
+
+            const r =
+                data[i];
+
+            const g =
+                data[i + 1];
+
+            const b =
+                data[i + 2];
+
+            const brightness =
+                (
+                    r +
+                    g +
+                    b
+                ) / 3;
+
+            if (
+                brightness < 80
+            ) {
+
+                if (x < minX)
+                    minX = x;
+
+                if (y < minY)
+                    minY = y;
+
+                if (x > maxX)
+                    maxX = x;
+
+                if (y > maxY)
+                    maxY = y;
+
+            }
+
+        }
+
+    }
+
+    const cropX =
+        Math.max(
+            0,
+            minX - 20
+        );
+
+    const cropY =
+        Math.max(
+            0,
+            minY - 20
+        );
+
+    const cropWidth =
+        Math.max(
+            300,
+            maxX - minX + 40
+        );
+
+    const cropHeight =
+        Math.max(
+            60,
+            maxY - minY + 40
+        );
+
+    canvas.width =
+        cropWidth * 4;
+
+    canvas.height =
+        cropHeight * 4;
+
+    ctx.drawImage(
+        video,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const debugImage =
+        document.getElementById(
+            "debugImage"
+        );
+
+    if (debugImage) {
+
+        debugImage.src =
+            canvas.toDataURL(
+                "image/jpeg",
+                1
+            );
+
+    }
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        1
+    );
+
 }
